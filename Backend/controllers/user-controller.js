@@ -32,7 +32,7 @@ const userController = {
         const existingEmail = await User.findOne({ email });
 
         if (existingEmail) {
-            throw new customError(409, "User already exists!");
+            res.status(409).json({ message: "User Already Exists" })
         }
         const user = await User.create({
             username,

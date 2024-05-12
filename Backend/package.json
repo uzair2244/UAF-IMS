@@ -1,5 +1,5 @@
 {
-  "name": "ecommerce-project",
+  "name": "UAF_IMS",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "nodemon server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Zubair Shahid and Uzair Shahid",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",

@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/Admin");
+const User = require("../models/User");
 
 const tokenVerification = async (req, res, next) => {
   let token = req.header("Authorization");
   if (!token) {
-    res.status(401).json({ message: "User is not login or the Auth Header is not set" });
+    res.status(401).json({ message: "Bad Request" });
     return;
   }
   token = token.split(" ")[1];

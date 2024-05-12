@@ -3,7 +3,7 @@ const User = require("../models/User");
 const customError = require("../utils/error");
 
 const addNewProduct = async (req, res) => {
-  const { name, code, units, price, market, location } = req.body;
+  const { name, units, price, market } = req.body;
   // const { id } = req;
   // console.log(req.body)
   const product = await Product.create({

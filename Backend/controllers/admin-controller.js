@@ -26,7 +26,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const Check = await Admin.findOne({email});
+    const Check = await Admin.findOne({ email });
     if (!Check) {
       throw new customError(404, "User not found");
     }
@@ -40,9 +40,8 @@ const loginUser = async (req, res) => {
       throw new customError(403, "Password or email is incorrect");
     }
   } catch (error) {
-    // Log the error for debugging
     console.error(error);
-    // Return an appropriate response to the client
+    console.log(process.env.SECRET_KEY)
     return res.status(error.statusCode || 500).json({ message: error.message });
   }
 };

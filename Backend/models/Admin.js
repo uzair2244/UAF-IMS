@@ -1,10 +1,22 @@
 const mongoose = require("mongoose");
-const joi = require("joi");
 
 const userModel = mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
+  username: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    default: "admin"
+  }
 });
 
 module.exports = mongoose.model("Admin", userModel);

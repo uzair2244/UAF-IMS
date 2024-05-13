@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, InputNumber, Popconfirm, Table, Typography, message } from 'antd';
 import axios from 'axios';
+import { userSelect } from '../app/selectors';
+import { useSelector } from 'react-redux';
 
 
 const token = localStorage.getItem("token");
@@ -44,21 +46,26 @@ const EditableCell = ({
 
 
 const EditProduct = () => {
+
+  const users = useSelector(userSelect)
+  const isUserAdmin = users.user.role === 'admin'
+
+
   const [messageApi, contextHolder] = message.useMessage()
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [editingKey, setEditingKey] = useState('');
   const isEditing = (record) => record.key === editingKey;
-  
+
   async function updateRow(row) {
     console.log(row)
     const result = await axios.put(`http://localhost:3000/api/v1/products/${row._id}`, row, { headers })
-    if(result.status === 200){
+    if (result.status === 200) {
       messageApi.open({
         type: 'success',
         content: 'Update Successfully',
       })
-    }else{
+    } else {
       messageApi.open({
         type: 'error',
         content: 'Update Failed',
@@ -66,17 +73,17 @@ const EditProduct = () => {
     }
   }
 
-  async function deleteRow(row){
-    const result = await axios.delete(`http://localhost:3000/api/v1/products/${row._id}`,{headers})
-    if(result.status === 200){
+  async function deleteRow(row) {
+    const result = await axios.delete(`http://localhost:3000/api/v1/products/${row._id}`, { headers })
+    if (result.status === 200) {
       messageApi.open({
-        type:"success",
-        content:"Delete Successfully"
+        type: "success",
+        content: "Delete Successfully"
       })
-    }else{
+    } else {
       messageApi.open({
-        type:"error",
-        content:"Delete Failed"
+        type: "error",
+        content: "Delete Failed"
       })
     }
   }
@@ -144,12 +151,6 @@ const EditProduct = () => {
       editable: true,
     },
     {
-      title: 'Product Code',
-      dataIndex: 'code',
-      width: '12%',
-      editable: true,
-    },
-    {
       title: 'Available Stock',
       dataIndex: 'units',
       width: '15%',
@@ -168,34 +169,36 @@ const EditProduct = () => {
       editable: true,
     },
     {
-      title: 'Location',
-      dataIndex: 'location',
-      width: '15%',
-      editable: true,
-    },
-    {
       title: 'Edit',
       dataIndex: 'operation',
       render: (_, record) => {
         const editable = isEditing(record);
-        return editable ? (
+        return (
           <span>
-            <Typography.Link
-              onClick={() => save(record.key)}
-              style={{
-                marginRight: 8,
-              }}
-            >
-              Save
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
-            </Popconfirm>
+            {isUserAdmin && (
+              <>
+                {editable ? (
+                  <span>
+                    <Typography.Link
+                      onClick={() => save(record.key)}
+                      style={{
+                        marginRight: 8,
+                      }}
+                    >
+                      Save
+                    </Typography.Link>
+                    <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                      <a>Cancel</a>
+                    </Popconfirm>
+                  </span>
+                ) : (
+                  <Typography.Link disabled={editingKey !== ''} onClick={(e) => edit(record)}>
+                    Edit
+                  </Typography.Link>
+                )}
+              </>
+            )}
           </span>
-        ) : (
-          <Typography.Link disabled={editingKey !== ''} onClick={(e) => edit(record)}>
-            Edit
-          </Typography.Link>
         );
       },
     },
@@ -203,7 +206,7 @@ const EditProduct = () => {
       title: 'Delete',
       dataIndex: 'operation',
       render: (_, record) =>
-        data.length >= 1 ? (
+        data.length >= 1 && isUserAdmin ? (
           <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
             <a>Delete</a>
           </Popconfirm>
@@ -212,8 +215,8 @@ const EditProduct = () => {
   ];
 
   const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
+    if (!col.editable && !isUserAdmin) {
+      return { ...col, title: '', width: '1%' };
     }
     return {
       ...col,
@@ -231,7 +234,7 @@ const EditProduct = () => {
     <div>
       {contextHolder}
       <div className='flex justify-center'>
-        <Typography.Title level={4}>Edit Products</Typography.Title>
+        <Typography.Title level={4}>View Inventory</Typography.Title>
       </div>
       <Form form={form} component={false}>
         <Table

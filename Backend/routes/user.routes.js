@@ -3,7 +3,7 @@ const { checkAdmin, checkManagement } = require("../middlewares/checkUserRole")
 
 const router = require('express').Router();
 
-router.get("/", checkAdmin, userController.getUser)
+router.get("/", userController.getUser)
 
 router.post("/login", userController.loginUser)
 

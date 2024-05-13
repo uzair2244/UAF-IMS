@@ -1,50 +1,74 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Descriptions, Form, Input, Select, Space, Tooltip, Typography, message } from 'antd';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { countPending } from '../features/taskSlice';
 import { increment } from '../features/taskSlice';
-import {addRegisteredUser,addTaskPending,addTasksAssigned,addTotalProducts} from '../features/dashboardSlice'
+import DropdownWithInput from './DropdownWithInput';
+import { InputNumber } from 'antd';
+import { addRegisteredUser, addTaskPending, addTasksAssigned, addTotalProducts } from '../features/dashboardSlice'
+
+
+
 const { Option } = Select;
 const onFinish = (values) => {
     console.log('Received values of form: ', values);
 };
+
+const onChange = (value) => {
+    console.log('changed', value);
+};
 const AssignTask = () => {
 
-    const headers = { "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2E2M2M4NDM2NmY0Y2Y3M2JmNjA0MCIsImlhdCI6MTcxNTEwMzkzNCwiZXhwIjoxNzE1MTkwMzM0fQ.FmWb7u9FbJQMxpCclcmb-CsScrICXc0_dJEVRtdUzeA" }
+    const [items, setItems] = useState([])
+    const temp = []
+    useEffect(() => {
+        axios.get(`http://localhost:3000/api/v1/products/names`)
+            .then((result) => {
+                for (let p of result.data.products) {
+                    temp.push({ "value": p.name })
+                }
+                setItems(temp)
+            })
+    }, [])
+
+    const token = localStorage.getItem('token')
+
+    const headers = { "Authorization": `Bearer ${token}` }
     const [messageApi, contextHolder] = message.useMessage()
 
     const dispatch = useDispatch()
     const [data, setData] = useState({
-        title: "",
+        item: "",
+        quantity: 0,
         worker: "",
         description: ""
     })
 
-    async function handleClick(e) {
-        e.preventDefault()
-        const result = await axios.post("http://localhost:3000/api/v1/task", data, { headers })
-        if(result.status === 200){
-            dispatch(increment())
-            dispatch(addTasksAssigned())
-            dispatch(addTaskPending())
-            messageApi.open({
-                type: "success",
-                content: "Task Inserted Successfully"
-            })
-        }else{
-            messageApi.open({
-                type: "error",
-                content: "Something Went Wrong"
-            })
-        }
-    }
+    // async function handleClick(e) {
+    //     e.preventDefault()
+    //     const result = await axios.post("http://localhost:3000/api/v1/", data, { headers })
+    //     if (result.status === 200) {
+    //         dispatch(increment())
+    //         dispatch(addTasksAssigned())
+    //         dispatch(addTaskPending())
+    //         messageApi.open({
+    //             type: "success",
+    //             content: "Task Inserted Successfully"
+    //         })
+    //     } else {
+    //         messageApi.open({
+    //             type: "error",
+    //             content: "Something Went Wrong"
+    //         })
+    //     }
+    // }
 
 
     return (
         <div className='flex flex-col items-center'>
             {contextHolder}
-            <Typography.Title level={4} style={{ paddingBottom: "20px" }}> Assign Tasks</Typography.Title>
+            <Typography.Title level={4} style={{ paddingBottom: "20px" }}> Assign Inventory</Typography.Title>
             <Form
                 name="complex-form"
                 onFinish={onFinish}
@@ -58,10 +82,10 @@ const AssignTask = () => {
                     maxWidth: 600,
                 }}
             >
-                <Form.Item label="Task Title">
+                <Form.Item label="Items">
                     <Space>
                         <Form.Item
-                            name="Task Title"
+                            name="items"
                             noStyle
                             rules={[
                                 {
@@ -70,17 +94,29 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <Input
-                                style={{
-                                    width: 160,
-                                }}
-                                value={data.title}
-                                onChange={(e) => { setData({ ...data, title: e.target.value }) }}
-                                placeholder="Please input"
-                            />
+                            <DropdownWithInput />
                         </Form.Item>
                     </Space>
                 </Form.Item>
+
+                <Form.Item label="Item Quantity: ">
+                    <Space>
+                        <Form.Item
+                            name="item quantiity"
+                            noStyle
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}
+                        >
+                            <InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />
+                        </Form.Item>
+                    </Space>
+                </Form.Item>
+
+
+
                 <Form.Item label="Worker">
                     <Space.Compact>
                         <Form.Item
@@ -93,14 +129,7 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <Input
-                                style={{
-                                    width: 160,
-                                }}
-                                value={data.worker}
-                                onChange={(e) => { setData({ ...data, worker: e.target.value }) }}
-                                placeholder="Please input the worker name"
-                            />
+                            <DropdownWithInput data={items} />
                         </Form.Item>
                     </Space.Compact>
                 </Form.Item>
@@ -108,8 +137,8 @@ const AssignTask = () => {
                     <Input.TextArea value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} />
                 </Form.Item>
                 <Form.Item label=" " colon={false}>
-                    <Button type="primary" htmlType="submit" onClick={handleClick}>
-                        Assign
+                    <Button type="primary" htmlType="submit" >
+                        Assign Inventory
                     </Button>
                 </Form.Item>
             </Form>

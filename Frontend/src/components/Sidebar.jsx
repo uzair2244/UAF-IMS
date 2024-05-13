@@ -15,29 +15,32 @@ import { taskSelect } from '../app/selectors';
 import { countPending } from '../features/taskSlice';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import userSlice from '../features/userSlice';
+import { userSelect } from '../app/selectors';
 
 
 
 const { Sider } = Layout
 
-const headers = {"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2E2M2M4NDM2NmY0Y2Y3M2JmNjA0MCIsImlhdCI6MTcxNTEwMzkzNCwiZXhwIjoxNzE1MTkwMzM0fQ.FmWb7u9FbJQMxpCclcmb-CsScrICXc0_dJEVRtdUzeA"}
+const headers = { "Authorization": "Bearer" } //token add karna h 
 
 const Sidebar = ({ handleCollapse }) => {
   const dispatch = useDispatch()
   const task = useSelector(taskSelect)
+  const users = useSelector(userSelect)
   // console.log(task.pending)
   const navigate = useNavigate()
 
   async function getTasks() {
     const result = await axios.get("http://localhost:3000/api/v1/task", { headers })
     if (result) {
-        dispatch(countPending(result.data.tasks))
+      dispatch(countPending(result.data.tasks))
     }
-}
+  }
 
-  useEffect(()=>{
+  useEffect(() => {
     getTasks();
-  },[])
+  }, [])
 
 
   const menuItems = [
@@ -47,7 +50,7 @@ const Sidebar = ({ handleCollapse }) => {
       label: 'Dashboard',
       onClick: () => { dispatch(setSelected({ selected: "dashboard" })) }
     },
-    {
+    (users.user.role === 'admin' || users.user.role === 'management') && {
       key: '2',
       icon: <PlusOutlined />,
       label: 'Inventory',
@@ -55,16 +58,16 @@ const Sidebar = ({ handleCollapse }) => {
         {
           key: '2-1',
           label: 'Add Inventory',
-          onClick: () => { dispatch(setSelected({ selected: "add product" })) }
+          onClick: () => { dispatch(setSelected({ selected: "add inventory" })) }
         },
         {
           key: '2-2',
           label: 'View Inventory',
-          onClick: () => { dispatch(setSelected({ selected: "edit product" })) }
+          onClick: () => { dispatch(setSelected({ selected: "edit inventory" })) }
         },
       ]
     },
-    {
+    users.user.role === 'admin' && {
       key: '3',
       icon: <UserAddOutlined />,
       label: 'Users',
@@ -81,24 +84,24 @@ const Sidebar = ({ handleCollapse }) => {
         },
       ]
     },
-    {
+    (users.user.role === 'management' || users.user.role === 'admin') && {
       key: '4',
-      icon:<CalendarOutlined />,
-      label: 'Assign Task',
+      icon: <CalendarOutlined />,
+      label: 'Assign Inventory',
       onClick: () => { dispatch(setSelected({ selected: "assign task" })) },
     },
     {
       key: '5',
-      icon:<Space><CalendarOutlined /><Badge size='small' color='red' count={task.pending}/></Space>,
+      icon: <Space><CalendarOutlined /><Badge size='small' color='red' count={task.pending} /></Space>,
       label: 'Tasks',
       onClick: () => { dispatch(setSelected({ selected: "tasks" })) },
     },
-    // {
-    //   key: '6',
-    //   icon: <LineChartOutlined />,
-    //   label: 'Reports',
-    //   onClick: () => { dispatch(setSelected({ selected: "reports" })) }
-    // },
+    {
+      key: '6',
+      icon: <LineChartOutlined />,
+      label: 'Reports',
+      onClick: () => { dispatch(setSelected({ selected: "reports" })) }
+    },
 
   ]
 
@@ -124,7 +127,7 @@ const Sidebar = ({ handleCollapse }) => {
         mode="inline"
         defaultSelectedKeys={['1']}
         items={menuItems}
-        
+
       />
       <Menu
         className='h-[40%] flex justify-end flex-col'
@@ -135,9 +138,10 @@ const Sidebar = ({ handleCollapse }) => {
             key: '0',
             icon: <LogoutOutlined />,
             label: 'Logout',
-            onClick:()=>{
+            onClick: () => {
               localStorage.removeItem("token")
-              navigate("/")}
+              navigate("/")
+            }
           },
         ]}
       />

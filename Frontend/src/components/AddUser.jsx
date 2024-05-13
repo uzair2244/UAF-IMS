@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, Form, Input, Tooltip, message } from "antd";
+import { Button, Checkbox, Dropdown, Form, Input, Tooltip, message } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import axios from 'axios';
-import {addRegisteredUser} from '../features/dashboardSlice';
+import { addRegisteredUser } from '../features/dashboardSlice';
 import { useDispatch } from 'react-redux';
+import DropDown from "./DropDown"
 
 const formItemLayout = {
     labelCol: {
@@ -27,29 +28,34 @@ const formItemLayout = {
 
 const AddUser = () => {
     const token = localStorage.getItem("token")
-    const headers = {"Authorization":`Bearer ${token}`}
+    const headers = { "Authorization": `Bearer ${token}` }
     const dispatch = useDispatch()
     const [messageApi, contextHolder] = message.useMessage()
 
     const [formData, setFormData] = useState({
-        name: "",
+        username: "",
+        email: "",
         password: "",
-        authorities: []
+        role: ""
     })
     async function handleSubmit(e) {
         e.preventDefault()
         const result = await axios.post(`http://localhost:3000/api/v1/user`, formData, { headers })
-        if (result.status === 200) {
-            dispatch(addRegisteredUser())
-            messageApi.open({
-                type: 'success',
-                content: 'User added successfully',
-            })
-        } else {
-            messageApi.open({
-                type: 'error',
-                content: 'Something went wrong',
-            })
+        try {
+            if (result.status === 201) {
+                dispatch(addRegisteredUser());
+                messageApi.open({
+                    type: 'success',
+                    content: 'User added successfully',
+                })
+            } else if (result.status === 409) {
+                messageApi.open({
+                    type: 'error',
+                    content: 'user already exist'
+                })
+            }
+        } catch (error) {
+            console.log(error.response)
         }
     }
 
@@ -66,9 +72,27 @@ const AddUser = () => {
                         <Input
                             placeholder="Enter your username"
                             value={formData.name}
-                            onChange={e => { setFormData({ ...formData, name: e.target.value }) }}
+                            onChange={e => { setFormData({ ...formData, username: e.target.value }) }}
                             suffix={
                                 <Tooltip title="You can login with the name.">
+                                    <InfoCircleOutlined style={{ color: "rgba(255,255,255,0.45)" }} />
+                                </Tooltip>
+                            }
+                        />
+                    </Form.Item>
+                </div>
+                <div className="my-3 flex justify-center">
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        className="w-full sm:w-1/2"
+                    >
+                        <Input
+                            placeholder="Enter your Email"
+                            value={formData.name}
+                            onChange={e => { setFormData({ ...formData, email: e.target.value }) }}
+                            suffix={
+                                <Tooltip title="You can login with the Email.">
                                     <InfoCircleOutlined style={{ color: "rgba(255,255,255,0.45)" }} />
                                 </Tooltip>
                             }
@@ -117,23 +141,8 @@ const AddUser = () => {
                         />
                     </Form.Item>
                 </div>
-                <div className="mx-5 my-3 flex justify-center">
-                    <Form.Item
-                        label="Select the user's authority"
-                        name="userAuthority"
-                        className="w-full sm:w-1/2"
-                    >
-                        <Checkbox.Group
-                            style={{ width: "100%", display: "grid" }}
-                            onChange={(checked) => { setFormData({ ...formData, authorities: checked }) }}
-                        >
-                            <Checkbox value="newProduct">Add Product</Checkbox>
-                            <Checkbox value="editProduct">Edit Product</Checkbox>
-                            <Checkbox value="addUser">Add User</Checkbox>
-                            <Checkbox value="editUser">Edit User</Checkbox>
-                            <Checkbox value="tasks">Tasks</Checkbox>
-                        </Checkbox.Group>
-                    </Form.Item>
+                <div className="mx-5 my-3 border pl-[23%]">
+                    <DropDown data={formData} handleData={setFormData} />
                 </div>
 
                 <div className="my-3 flex justify-center">

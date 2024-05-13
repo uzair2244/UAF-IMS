@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require("bcrypt")
 const customError = require('../utils/error');
 const jwt = require("jsonwebtoken")
+const _ = require('lodash')
 
 const userController = {
     getUser: async (req, res) => {
@@ -32,7 +33,7 @@ const userController = {
         const existingEmail = await User.findOne({ email });
 
         if (existingEmail) {
-            res.status(409).json({ message: "User Already Exists" })
+            return res.status(409).json({ message: "User Already Exists" })
         }
         const user = await User.create({
             username,
@@ -82,7 +83,7 @@ const userController = {
                 const token = jwt.sign({ id: Check._id }, process.env.SECRET_KEY, {
                     expiresIn: "1d",
                 });
-                return res.status(200).json({ message: "Successful Login", token });
+                return res.status(200).json({ message: "Successful Login", token, user: _.pick(Check, ["username", "email", "role"]) });
             } else {
                 throw new customError(403, "Password or email is incorrect");
             }

@@ -4,14 +4,14 @@ import Head from './Head';
 import Dash from './Dash';
 import { Layout, theme } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import {sidebarSelect} from "../app/selectors"
+import { sidebarSelect } from "../app/selectors"
 import { useSelector } from 'react-redux';
 import AddProduct from './AddProduct';
 import AddUser from './AddUser';
 import EditProduct from './EditProduct';
 import EditUser from './EditUser';
 import Tasks from './Tasks';
-import AssignTask from './AssignTasks';
+import AssignInventory from './AssignInventory'
 
 const Dashboard = () => {
     const navigate = useNavigate()
@@ -53,13 +53,13 @@ const Dashboard = () => {
                         }}
                     >
                         {selected === "dashboard" && <Dash />}
-                        {selected === "add product" && <AddProduct />}
+                        {selected === "add inventory" && <AddProduct />}
                         {selected === "add user" && <AddUser />}
-                        {selected === "edit product" && <EditProduct />}
+                        {selected === "edit inventory" && <EditProduct />}
                         {selected === "edit user" && <EditUser />}
                         {selected === "tasks" && <Tasks />}
-                        {selected === "assign task" && <AssignTask />}
-                    
+                        {selected === "assign task" && <AssignInventory />}
+
                     </div>
                 </Content>
             </Layout>

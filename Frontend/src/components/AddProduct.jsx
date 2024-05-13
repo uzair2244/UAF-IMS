@@ -13,7 +13,7 @@ import {
   Typography,
   message
 } from 'antd';
-import {addTotalProducts} from '../features/dashboardSlice';
+import { addTotalProducts } from '../features/dashboardSlice';
 import { useDispatch } from 'react-redux';
 
 const { RangePicker } = DatePicker;
@@ -38,30 +38,28 @@ const formItemLayout = {
 
 
 const AddProduct = () => {
-  const [messageApi,contextHolder] = message.useMessage()
+  const [messageApi, contextHolder] = message.useMessage()
   const [productData, setProductData] = useState({
     name: "",
-    code: "",
     units: "",
     price: "",
-    market: "",
-    location: ""
+    market: ""
   })
   const dispatch = useDispatch()
 
-  async function handleSubmit(e){
+  async function handleSubmit(e) {
     e.preventDefault()
     const token = localStorage.getItem("token")
-    const headers = {"Authorization":`Bearer ${token}`}
-    const result = await axios.post("http://localhost:3000/api/v1/products",productData, {headers})
-    
-    if(result.data.message === "Product inserted successfully!"){
+    const headers = { "Authorization": `Bearer ${token}` }
+    const result = await axios.post("http://localhost:3000/api/v1/products", productData, { headers })
+
+    if (result.data.message === "Product inserted successfully!") {
       dispatch(addTotalProducts())
       messageApi.open({
         type: 'success',
         content: 'Product Added Successfully',
-      }) 
-    }else{
+      })
+    } else {
       message.open({
         type: 'error',
         content: 'Something went wrong',
@@ -72,7 +70,7 @@ const AddProduct = () => {
   return (
     <div className='py-3 flex flex-col justify-center items-center '>
       {contextHolder}
-      <Typography.Title level={3} style={{ marginLeft: "-10vh" }}>Add Product</Typography.Title>
+      <Typography.Title level={3} style={{ marginLeft: "-10vh" }}>Add Inventory</Typography.Title>
       <div className={"w-1/2"}>
         <Form
           {...formItemLayout}
@@ -92,19 +90,6 @@ const AddProduct = () => {
             ]}
           >
             <Input value={productData.name} onChange={(e) => { setProductData({ ...productData, name: e.target.value }) }} />
-          </Form.Item>
-
-          <Form.Item
-            label="Product Code"
-            name="prod_code"
-            rules={[
-              {
-                required: true,
-                message: "Product Code is Required Example: #A0005",
-              },
-            ]}
-          >
-            <Input value={productData.code} onChange={e=>{setProductData({...productData, code:e.target.value})}} />
           </Form.Item>
 
           <Form.Item
@@ -151,19 +136,6 @@ const AddProduct = () => {
             ]}
           >
             <Input value={productData.market} onChange={e => setProductData({ ...productData, market: e.target.value })} />
-          </Form.Item>
-
-          <Form.Item
-            label="Location"
-            name="prod_location"
-            rules={[
-              {
-                required: true,
-                message: 'Please input location where is the product is stored!',
-              },
-            ]}
-          >
-            <Input value={productData.location} onChange={e => setProductData({ ...productData, location: e.target.value })} />
           </Form.Item>
 
           <Form.Item

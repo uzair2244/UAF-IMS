@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, InputNumber, Popconfirm, Table, Typography, Select, message } from 'antd';
 import axios from 'axios';
+import DropDownForEditUser from "./DropDownForEditUser"
 
-const headers = { "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2E2M2M4NDM2NmY0Y2Y3M2JmNjA0MCIsImlhdCI6MTcxNTEwMzkzNCwiZXhwIjoxNzE1MTkwMzM0fQ.FmWb7u9FbJQMxpCclcmb-CsScrICXc0_dJEVRtdUzeA" }
+
+const token = localStorage.getItem('token')
+const headers = { "Authorization": `Bearer ${token}` }
 
 
 const EditableCell = ({
@@ -98,9 +101,6 @@ const EditUser = () => {
 
   const edit = (record) => {
     form.setFieldsValue({
-      name: '',
-      age: '',
-      address: '',
       ...record,
     });
     setEditingKey(record.key);
@@ -138,70 +138,28 @@ const EditUser = () => {
     setData(newData);
   };
 
-  const handleAuthorityChange = (value, record) => {
-    const newData = [...data];
-    const index = newData.findIndex((item) => record.key === item.key);
-    if (index > -1) {
-      const item = newData[index];
-      updateRow({ ...item, authority: value })
-      newData.splice(index, 1, {
-        ...item,
-        authority: value,
-      });
-      setData(newData);
-    }
-  };
-
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: 'username',
+      dataIndex: 'username',
       width: '25%',
       editable: true,
     },
     {
-      title: 'Password',
-      dataIndex: 'password',
+      title: 'Email',
+      dataIndex: 'email',
       width: '25%',
       editable: true,
     },
     {
-      title: 'Authority',
-      dataIndex: 'authority',
+      title: 'Role',
+      dataIndex: 'role',
       width: '25%',
-      editable: true,
+      editable: false,
       render: (text, record) => {
-        if (isEditing(record)) {
-          return (
-            <Form.Item
-              name={dataIndex}
-              style={{
-                margin: 0,
-              }}
-              rules={[
-                {
-                  required: true,
-                  message: `Please Input ${title}!`,
-                },
-              ]}
-            >
-              <Select
-                mode="multiple"
-                value={text}
-                onChange={(value) => handleAuthorityChange(value, record)}
-                className='w-full'
-              >
-                <Select.Option value="addProduct">Add Product</Select.Option>
-                <Select.Option value="addUser">Add User</Select.Option>
-                <Select.Option value="editProduct">Edit Product</Select.Option>
-                <Select.Option value="editUser">Edit User</Select.Option>
-                <Select.Option value="tasks">Tasks</Select.Option>
-              </Select>
-            </Form.Item>
-          );
-        } else {
-          return text;
-        }
+        return (
+          <DropDownForEditUser role={data.role} />
+        );
       },
     },
     {

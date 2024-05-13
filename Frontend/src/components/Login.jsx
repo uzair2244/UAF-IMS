@@ -3,6 +3,9 @@ import { Button, Checkbox, Form, Input, Typography, Image, message } from 'antd'
 import { json, useNavigate } from 'react-router-dom';
 import logo from "/logo.svg"
 import axios from 'axios';
+import { setUser } from '../features/userSlice';
+import { userSelect } from '../app/selectors';
+import { useDispatch, useSelector } from 'react-redux';
 
 const onFinish = (values) => {
     console.log('Success:', values);
@@ -12,6 +15,7 @@ const onFinishFailed = (errorInfo) => {
 };
 
 const Login = () => {
+    const dispatch = useDispatch()
 
     const [messageApi, contextHolder] = message.useMessage()
 
@@ -22,113 +26,117 @@ const Login = () => {
             messageApi.open({
                 type: "warning",
                 content: "Please fill all the fields"
-            })}
+            })
+        }
         else {
-            await axios.post("http://localhost:3000/api/v1/admin/login", formData)
+            await axios.post("http://localhost:3000/api/v1/user/login", formData)
                 .then((result) => {
                     console.log(result)
                     if (result.status === 200) {
-
                         localStorage.setItem('token', result.data.token)
+                        dispatch(setUser(result.data.user))
                         navigate("/dashboard")
                     }
                 }
-        ).catch((error)=>
-            messageApi.open({
-                type: "error",
-                content: "Invalid Credentials"
-            })
-        )}
+                ).catch((error) => {
+                    console.log(error)
+                    messageApi.open({
+                        type: "error",
+                        content: "Invalid Credentials"
+                    })
+                }
+                )
+        }
 
-}
+    }
 
-// const handleSubmit = ()=>{
-//     localStorage.setItem("username",formData.username);
-//     localStorage.setItem("password",formData.password);
-//     navigate("/dashboard")
-// }
+    // const handleSubmit = ()=>{
+    //     localStorage.setItem("username",formData.username);
+    //     localStorage.setItem("password",formData.password);
+    //     navigate("/dashboard")
+    // }
 
-const [formData, setFormData] = useState({
-    email: "",
-    password: ""
-})
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    })
 
-return (
-    <div className='flex justify-center items-center h-screen'>
-        {contextHolder}
-        <div className='h-full w-3/4 bg-slate-300 flex justify-center items-center'>
-            <Image src={logo} width={270} />
-        </div>
-        <div className='w-1/2 h-screen items-center justify-center flex flex-col'>
-            <Typography.Title level={3}>Login Form</Typography.Title>
-            <Form
-                name="basic"
-                labelCol={{
-                    span: 8,
-                }}
-                wrapperCol={{
-                    span: 16,
-                }}
-                style={{
-                    maxWidth: 600,
-                }}
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
-            >
-                <Form.Item
-                    label="Username"
-                    name="username"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your username!',
-                        },
-                    ]}
-                >
-                    <Input onChange={e => setFormData({ ...formData, email: e.target.value })} />
-                </Form.Item>
-
-                <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your password!',
-                        },
-                    ]}
-                >
-                    <Input.Password onChange={e => setFormData({ ...formData, password: e.target.value })} />
-                </Form.Item>
-
-                <Form.Item
-                    name="remember"
-                    valuePropName="checked"
+    return (
+        <div className='flex justify-center items-center h-screen'>
+            {contextHolder}
+            <div className='h-full w-3/4 bg-slate-300 flex justify-center items-center'>
+                <Image src={logo} width={270} />
+            </div>
+            <div className='w-1/2 h-screen items-center justify-center flex flex-col'>
+                <Typography.Title level={3}>Login Form</Typography.Title>
+                <Form
+                    name="basic"
+                    labelCol={{
+                        span: 8,
+                    }}
                     wrapperCol={{
-                        offset: 8,
                         span: 16,
                     }}
-                >
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-
-                <Form.Item
-                    wrapperCol={{
-                        offset: 8,
-                        span: 16,
+                    style={{
+                        maxWidth: 600,
                     }}
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
                 >
-                    <Button type="primary" htmlType="submit" onClick={handleSubmit}>
-                        Submit
-                    </Button>
-                </Form.Item>
-            </Form>
+                    <Form.Item
+                        label="Username"
+                        name="username"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your username!',
+                            },
+                        ]}
+                    >
+                        <Input onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Password"
+                        name="password"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your password!',
+                            },
+                        ]}
+                    >
+                        <Input.Password onChange={e => setFormData({ ...formData, password: e.target.value })} />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="remember"
+                        valuePropName="checked"
+                        wrapperCol={{
+                            offset: 8,
+                            span: 16,
+                        }}
+                    >
+                        <Checkbox>Remember me</Checkbox>
+                    </Form.Item>
+
+                    <Form.Item
+                        wrapperCol={{
+                            offset: 8,
+                            span: 16,
+                        }}
+                    >
+                        <Button type="primary" htmlType="submit" onClick={handleSubmit}>
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </div>
         </div>
-    </div>
-)
+    )
 };
 export default Login;

@@ -8,7 +8,7 @@ import { sidebarSelect } from "../app/selectors"
 import { useSelector } from 'react-redux';
 import AddProduct from './AddProduct';
 import AddUser from './AddUser';
-import EditProduct from './EditProduct';
+import EditProduct2 from './EditProduct2';
 import EditUser from './EditUser';
 import Tasks from './Tasks';
 import AssignInventory from './AssignInventory'
@@ -55,7 +55,7 @@ const Dashboard = () => {
                         {selected === "dashboard" && <Dash />}
                         {selected === "add inventory" && <AddProduct />}
                         {selected === "add user" && <AddUser />}
-                        {selected === "edit inventory" && <EditProduct />}
+                        {selected === "edit inventory" && <EditProduct2 />}
                         {selected === "edit user" && <EditUser />}
                         {selected === "tasks" && <Tasks />}
                         {selected === "assign task" && <AssignInventory />}

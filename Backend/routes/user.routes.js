@@ -11,9 +11,9 @@ router.get("/usernames", userController.getAllUsernames)
 
 router.post("/", userController.addUser)
 
-router.delete("/delete/:userId", checkAdmin, userController.deleteUser)
+router.delete("/delete/:userId", userController.deleteUser)
 
-router.put("/update/:userId", checkAdmin, userController.updateUser)
+router.put("/update/:userId", userController.updateUser)
 
 const userRouter = router;
 

@@ -7,6 +7,8 @@ import { increment } from '../features/taskSlice';
 import DropdownWithInput from './DropdownWithInput';
 import { InputNumber } from 'antd';
 import { addRegisteredUser, addTaskPending, addTasksAssigned, addTotalProducts } from '../features/dashboardSlice'
+import { userSelect } from '../app/selectors';
+import { useSelector } from 'react-redux';
 
 
 
@@ -15,20 +17,35 @@ const onFinish = (values) => {
     console.log('Received values of form: ', values);
 };
 
-const onChange = (value) => {
-    console.log('changed', value);
-};
 const AssignTask = () => {
 
     const [items, setItems] = useState([])
-    const temp = []
+    const [workers, setWorkers] = useState([])
+    const [totalItems, setTotalItems] = useState([])
+
+    const users = useSelector(userSelect)
+    const [formData, setFormData] = useState({
+        assigner: users.user._id,
+        user: "",
+        item: "",
+        quantity: "",
+        description: ""
+    })
+
+    const onChange = (value) => {
+        console.log('changed', value);
+        setFormData({ ...formData, quantity: value })
+    };
+
     useEffect(() => {
         axios.get(`http://localhost:3000/api/v1/products/names`)
             .then((result) => {
-                for (let p of result.data.products) {
-                    temp.push({ "value": p.name })
-                }
-                setItems(temp)
+                setItems(result.data.products)
+                setTotalItems(result.data.products.length)
+            })
+        axios.get(`http://localhost:3000/api/v1/user/usernames`)
+            .then((result) => {
+                setWorkers(result.data)
             })
     }, [])
 
@@ -94,7 +111,7 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <DropdownWithInput />
+                            <DropdownWithInput data={items} key={"items"} name={"items"} handleFormData={setFormData} formData={formData} />
                         </Form.Item>
                     </Space>
                 </Form.Item>
@@ -110,7 +127,7 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />
+                            <InputNumber min={1} max={totalItems} defaultValue={3} onChange={onChange} />
                         </Form.Item>
                     </Space>
                 </Form.Item>
@@ -129,12 +146,12 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <DropdownWithInput data={items} />
+                            <DropdownWithInput data={workers} key="workers" name={"workers"} handleFormData={setFormData} formData={formData} />
                         </Form.Item>
                     </Space.Compact>
                 </Form.Item>
                 <Form.Item name={['user', 'description']} label="Description">
-                    <Input.TextArea value={data.description} onChange={(e) => { setData({ ...data, description: e.target.value }) }} />
+                    <Input.TextArea value={data.description} onChange={(e) => { setFormData({ ...formData, description: e.target.value }) }} />
                 </Form.Item>
                 <Form.Item label=" " colon={false}>
                     <Button type="primary" htmlType="submit" >

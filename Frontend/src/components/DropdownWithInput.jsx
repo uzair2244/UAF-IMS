@@ -1,27 +1,40 @@
-import React, { useState } from 'react';
-import { AutoComplete } from 'antd';
+import React from 'react';
+import { Select } from 'antd';
 
-const DropdownWithInput = ({ data }) => {
-  const [searchValue, setSearchValue] = useState('');
-  console.log(data)
-  const options = [{
-    value: 'Uzair'
-  },
-  { value: 'zubair' }];
 
-  const filteredOptions = options.filter((option) =>
-    option.value.toLowerCase().includes(searchValue.toLowerCase())
-  );
+const filterOption = (input, option) =>
+  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+
+
+const DropdownWithInput = ({ data, key, name, handleFormData, formData }) => {
+  const onChange = (value) => {
+    console.log(`selected ${value}`);
+    console.log(formData)
+    if (name === 'workers') {
+      handleFormData({ ...formData, user: value })
+    }
+    if (name === 'items') {
+      handleFormData({ ...formData, item: value })
+    }
+  };
+  const onSearch = (value) => {
+    console.log('search:', value);
+  };
 
   return (
-    <AutoComplete
-      options={filteredOptions}
-      style={{ width: 200 }}
-      placeholder="Start writing here or click"
-      onChange={(value) => setSearchValue(value)}
-      value={searchValue}
+    <Select
+      showSearch
+      placeholder="Select a person"
+      optionFilterProp="children"
+      onChange={onChange}
+      onSearch={onSearch}
+      filterOption={filterOption}
+      options={data.map((val, i) => {
+        return ({ value: val.name, label: val.name, key: i })
+      })}
     />
-  );
-};
+  )
 
+};
 export default DropdownWithInput;

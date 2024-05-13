@@ -19,8 +19,8 @@ const userController = {
             query.role = role
         }
         try {
-            const users = await User.find(query, { name: 1, _id: 0 });
-            const usernames = users.map(user => user.name);
+            const users = await User.find(query, { username: 1, _id: 0 });
+            const usernames = users.map(user => ({ name: user.username }))
             res.status(200).json(usernames);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -83,7 +83,7 @@ const userController = {
                 const token = jwt.sign({ id: Check._id }, process.env.SECRET_KEY, {
                     expiresIn: "1d",
                 });
-                return res.status(200).json({ message: "Successful Login", token, user: _.pick(Check, ["username", "email", "role"]) });
+                return res.status(200).json({ message: "Successful Login", token, user: _.pick(Check, ["username", "email", "role", "_id"]) });
             } else {
                 throw new customError(403, "Password or email is incorrect");
             }

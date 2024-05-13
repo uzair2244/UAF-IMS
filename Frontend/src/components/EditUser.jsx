@@ -55,7 +55,7 @@ const EditUser = () => {
   const [messageApi, contextHolder] = message.useMessage()
 
   async function updateRow(row) {
-    const result = await axios.put(`http://localhost:3000/api/v1/products/${row._id}`, row, { headers })
+    const result = await axios.put(`http://localhost:3000/api/v1/user/update/${row._id}`, row, { headers })
     if (result.status === 200) {
       messageApi.open({
         type: 'success',
@@ -155,10 +155,10 @@ const EditUser = () => {
       title: 'Role',
       dataIndex: 'role',
       width: '25%',
-      editable: false,
+      editable: true,
       render: (text, record) => {
         return (
-          <DropDownForEditUser role={data.role} />
+          <span>{record.role}</span>
         );
       },
     },

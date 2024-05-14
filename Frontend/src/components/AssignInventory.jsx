@@ -41,7 +41,6 @@ const AssignTask = () => {
         axios.get(`http://localhost:3000/api/v1/products/names`)
             .then((result) => {
                 setItems(result.data.products)
-                setTotalItems(result.data.products.length)
             })
         axios.get(`http://localhost:3000/api/v1/user/usernames`)
             .then((result) => {
@@ -81,6 +80,19 @@ const AssignTask = () => {
     //     }
     // }
 
+    async function handleAssign(e) {
+        e.preventDefault()
+        axios.post(`http://localhost:3000/api/v1/transaction/assign`, formData, { headers })
+            .then(result => {
+                if (result.status === 201) {
+                    messageApi.open({
+                        type: 'success',
+                        content: 'Inventory assigned successfully.'
+                    })
+                }
+            })
+    }
+
 
     return (
         <div className='flex flex-col items-center'>
@@ -111,7 +123,7 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <DropdownWithInput data={items} key={"items"} name={"items"} handleFormData={setFormData} formData={formData} />
+                            <DropdownWithInput data={items} key={"items"} name={"items"} handleFormData={setFormData} formData={formData} handleTotalItem={setTotalItems} />
                         </Form.Item>
                     </Space>
                 </Form.Item>
@@ -127,7 +139,7 @@ const AssignTask = () => {
                                 },
                             ]}
                         >
-                            <InputNumber min={1} max={totalItems} defaultValue={3} onChange={onChange} />
+                            <InputNumber min={1} max={parseInt(totalItems)} onChange={onChange} />
                         </Form.Item>
                     </Space>
                 </Form.Item>
@@ -154,7 +166,7 @@ const AssignTask = () => {
                     <Input.TextArea value={data.description} onChange={(e) => { setFormData({ ...formData, description: e.target.value }) }} />
                 </Form.Item>
                 <Form.Item label=" " colon={false}>
-                    <Button type="primary" htmlType="submit" >
+                    <Button type="primary" htmlType="submit" onClick={handleAssign} >
                         Assign Inventory
                     </Button>
                 </Form.Item>

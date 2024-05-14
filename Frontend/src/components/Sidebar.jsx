@@ -16,7 +16,7 @@ import { countPending } from '../features/taskSlice';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import userSlice from '../features/userSlice';
-import { userSelect } from '../app/selectors';
+import { userSelect, dashboardSelect } from '../app/selectors';
 
 
 
@@ -25,6 +25,7 @@ const { Sider } = Layout
 const headers = { "Authorization": "Bearer" } //token add karna h 
 
 const Sidebar = ({ handleCollapse }) => {
+  const dashboard = useSelector(dashboardSelect)
   const dispatch = useDispatch()
   const task = useSelector(taskSelect)
   const users = useSelector(userSelect)
@@ -88,16 +89,22 @@ const Sidebar = ({ handleCollapse }) => {
       key: '4',
       icon: <CalendarOutlined />,
       label: 'Assign Inventory',
-      onClick: () => { dispatch(setSelected({ selected: "assign task" })) },
+      onClick: () => { dispatch(setSelected({ selected: "assign inventory" })) },
     },
     {
       key: '5',
-      icon: <Space><CalendarOutlined /><Badge size='small' color='red' count={task.pending} /></Space>,
+      icon: <LineChartOutlined />,
+      label: 'Assign Task',
+      onClick: () => { dispatch(setSelected({ selected: "assign task" })) }
+    },
+    {
+      key: '6',
+      icon: <Space><CalendarOutlined /><Badge size='small' color='red' count={dashboard.tasksPending} /></Space>,
       label: 'Tasks',
       onClick: () => { dispatch(setSelected({ selected: "tasks" })) },
     },
     {
-      key: '6',
+      key: '7',
       icon: <LineChartOutlined />,
       label: 'Reports',
       onClick: () => { dispatch(setSelected({ selected: "reports" })) }

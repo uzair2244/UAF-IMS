@@ -12,6 +12,8 @@ import EditProduct2 from './EditProduct2';
 import EditUser from './EditUser';
 import Tasks from './Tasks';
 import AssignInventory from './AssignInventory'
+import Report from './Report'
+import AssignTask from './AssignTask';
 
 const Dashboard = () => {
     const navigate = useNavigate()
@@ -58,7 +60,9 @@ const Dashboard = () => {
                         {selected === "edit inventory" && <EditProduct2 />}
                         {selected === "edit user" && <EditUser />}
                         {selected === "tasks" && <Tasks />}
-                        {selected === "assign task" && <AssignInventory />}
+                        {selected === "assign inventory" && <AssignInventory />}
+                        {selected === "reports" && <Report />}
+                        {selected === "assign task" && <AssignTask />}
 
                     </div>
                 </Content>

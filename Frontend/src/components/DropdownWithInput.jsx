@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Select } from 'antd';
 
 
@@ -7,8 +7,11 @@ const filterOption = (input, option) =>
 
 
 
-const DropdownWithInput = ({ data, key, name, handleFormData, formData }) => {
-  const onChange = (value) => {
+
+const DropdownWithInput = ({ data, key, name, handleFormData, formData, handleTotalItem }) => {
+
+
+  const onChange = (value, i) => {
     console.log(`selected ${value}`);
     console.log(formData)
     if (name === 'workers') {
@@ -16,6 +19,7 @@ const DropdownWithInput = ({ data, key, name, handleFormData, formData }) => {
     }
     if (name === 'items') {
       handleFormData({ ...formData, item: value })
+      handleTotalItem(i.units)
     }
   };
   const onSearch = (value) => {
@@ -31,7 +35,7 @@ const DropdownWithInput = ({ data, key, name, handleFormData, formData }) => {
       onSearch={onSearch}
       filterOption={filterOption}
       options={data.map((val, i) => {
-        return ({ value: val.name, label: val.name, key: i })
+        return ({ value: val.name, label: val.name, key: i, units: val.units })
       })}
     />
   )

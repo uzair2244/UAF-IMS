@@ -1,13 +1,37 @@
-import React from 'react'
-import { Row,Col } from 'antd'
+import React, { useEffect } from 'react'
+import { Row, Col } from 'antd'
 import Cards from './Cards'
 import { useDispatch, useSelector } from 'react-redux'
-import { dashboardSelect } from '../app/selectors'
-import {reduceTaskPending} from '../features/dashboardSlice'
+import { dashboardSelect, userSelect } from '../app/selectors'
+import { addTotalProducts, addRegisteredUser, addTasksAssigned, addTaskPending } from '../features/dashboardSlice'
+import axios from 'axios'
 
 const Dash = () => {
     const dispatch = useDispatch()
     const dashboard = useSelector(dashboardSelect)
+    const users = useSelector(userSelect)
+
+    useEffect(() => {
+        axios.get(`http://localhost:3000/api/v1/products`)
+            .then(res => dispatch(addTotalProducts(res.data.products.length)))
+        axios.get(`http://localhost:3000/api/v1/user`)
+            .then(res => {
+                dispatch(addRegisteredUser(res.data.users.length))
+            })
+        axios.get(`http://localhost:3000/api/v1/task/${users.user._id}`)
+            .then(res => {
+                console.log(res.data.tasks)
+                dispatch(addTasksAssigned(res.data.tasks.length))
+            })
+        axios.get(`http://localhost:3000/api/v1/task/pending/${users.user._id}`)
+            .then(res => {
+                console.log(res.data.tasks)
+                dispatch(addTaskPending(res.data.tasks.length))
+            })
+    }, [])
+
+
+
     return (
         <div className='flex flex-col gap-5'>
             <Row gutter={16}>

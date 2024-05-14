@@ -1,12 +1,14 @@
 const Task = require("../models/Task")
+const User = require("../models/User")
 const customError = require("../utils/error");
 
 const taskController = {
   addTask: async (req, res) => {
-    const { title, worker, description } = req.body
+    const { title, user, assigner, description } = req.body
     const newTask = await Task.create({
       title,
-      worker,
+      user,
+      assigner,
       description
     })
     if (newTask) {
@@ -14,11 +16,45 @@ const taskController = {
     }
   },
   getTasks: async (req, res) => {
-    const tasks = await Task.find()
-    if (tasks) {
-      res.status(200).json({ message: "All tasks are fetched", tasks })
-    } else {
-      throw new customError(500, "Something went wrong!");
+    const user = await User.findById(req.params.id)
+    let query = {}
+    if (user.role === "admin" || user.role === "management") {
+      const tasks = await Task.find(query)
+      if (tasks) {
+        res.status(200).json({ message: "All tasks are fetched", tasks })
+      } else {
+        throw new customError(500, "Something went wrong!");
+      }
+    }
+    else {
+      query = { assigner: req.params.id }
+      const tasks = await Task.find(query)
+      if (tasks) {
+        res.status(200).json({ message: "All tasks are fetched", tasks })
+      } else {
+        throw new customError(500, "Something went wrong!");
+      }
+    }
+  },
+  getPending: async (req, res) => {
+    const user = await User.findById(req.params.id)
+    let query = { status: "pending" }
+    if (user.role === "admin" || user.role === "management") {
+      const tasks = await Task.find(query)
+      if (tasks) {
+        res.status(200).json({ message: "All tasks are fetched", tasks })
+      } else {
+        throw new customError(500, "Something went wrong!");
+      }
+    }
+    else {
+      query.assigner = req.params.id
+      const tasks = await Task.find(query)
+      if (tasks) {
+        res.status(200).json({ message: "All tasks are fetched", tasks })
+      } else {
+        throw new customError(500, "Something went wrong!");
+      }
     }
   },
   deleteTask: async (req, res) => {

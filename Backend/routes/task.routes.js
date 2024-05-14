@@ -3,12 +3,14 @@ const { checkAdmin } = require("../middlewares/checkUserRole")
 
 const router = require('express').Router();
 
-router.get("/", taskController.getTasks)
+router.get("/:id", taskController.getTasks)
+
+router.get("/pending/:id", taskController.getPending)
 
 router.post("/", taskController.addTask)
 
-router.delete("/:id", checkAdmin, taskController.deleteTask)
+router.delete("/:id", taskController.deleteTask)
 
-router.put("/:id", checkAdmin, taskController.completeTask)
+router.put("/:id", taskController.completeTask)
 
 module.exports = router

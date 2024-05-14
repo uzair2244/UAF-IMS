@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 module.exports = mongoose.model("Task", mongoose.Schema({
@@ -5,7 +6,11 @@ module.exports = mongoose.model("Task", mongoose.Schema({
         type: String,
         required: true,
     },
-    worker: {
+    assigner: {
+        type: String,
+        required: true
+    },
+    user: {
         type: String,
         required: true,
     },

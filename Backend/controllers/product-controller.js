@@ -65,7 +65,7 @@ const getProduct = async (req, res) => {
   }
 };
 const getAllProductNames = async (req, res) => {
-  const products = await Product.find({}, { name: 1, _id: 0 });
+  const products = await Product.find({}, { name: 1, _id: 0, units: 1 });
   if (products) {
     res
       .status(200)
